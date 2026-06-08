@@ -37,6 +37,7 @@ var score = 0;
 var wrong = [];
 var locked = false;
 var currentMode = "";
+var shuffleChoices = false;
 
 function esc(s){
   return String(s).replace(/[&<>"']/g,function(c){
@@ -70,11 +71,13 @@ function home(){
 }
 function startSourceQuiz(source){
   currentMode=source;
+  shuffleChoices=false;
   activeQuestions=allQuestions.filter(function(q){return q.source===source;});
   start();
 }
 function startRandom60(){
   currentMode="Random 60";
+  shuffleChoices=true;
   activeQuestions=shuffle(allQuestions).slice(0,60);
   start();
 }
@@ -84,6 +87,7 @@ function start(){
 function showQuestion(){
   locked=false;
   var q=activeQuestions[qIndex];
+  var options=shuffleChoices ? shuffle(q.o) : q.o;
   var type=q.multi?'checkbox':'radio';
   var progress=Math.round((qIndex/activeQuestions.length)*100);
   var html='<div class="card">';
@@ -93,8 +97,8 @@ function showQuestion(){
   html+='<h3>'+esc(q.q)+'</h3>';
   if(q.code) html+='<pre>'+esc(q.code)+'</pre>';
   if(q.multi) html+='<p><b>Select all that apply.</b></p>';
-  for(var i=0;i<q.o.length;i++){
-    html+='<div class="choice"><label><input type="'+type+'" name="ans" value="'+esc(q.o[i])+'"><span>'+esc(q.o[i])+'</span></label></div>';
+  for(var i=0;i<options.length;i++){
+    html+='<div class="choice"><label><input type="'+type+'" name="ans" value="'+esc(options[i])+'"><span>'+esc(options[i])+'</span></label></div>';
   }
   html+='<button onclick="submitAnswer()">Submit Answer</button>';
   html+='<button class="light" onclick="home()">Back to Menu</button>';
